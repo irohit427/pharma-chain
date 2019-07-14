@@ -1,0 +1,116 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Write your model definitions here
+ */
+
+namespace org.example.pharma
+
+enum ActorType {
+  o MANUFACTURER
+  o DISTRIBUTOR
+  o WHOLESALER
+  o PHARMACIST
+  o RECIPIENT
+}
+
+enum ShipmentStatus {
+  o CREATED
+  o IN_TRANSIT
+  o VERIFIED
+}
+
+enum DrugStatus {
+  o INITIAL
+  o INITIATED
+  o VERIFIED
+  o COUNTERFEIT
+  o COMPLETED
+}
+
+asset Drug identified by serialNumber {
+  o String serialNumber
+  o String drugName
+  o String drugDesc
+  o String productHash
+  o DateTime mfd
+  o DrugStatus status
+  o DateTime exp
+  o Double price
+  --> Manufacturer manufacturer
+  --> Actor owner
+  --> Actor[] previousOwners
+}
+
+asset Shipment identified by shipmentID {
+  o String shipmentID
+  o ShipmentStatus status
+  --> Drug[] drugs
+  --> Actor buyer
+  --> Actor seller
+}
+
+//Participant taking part in the supply chain
+abstract participant Actor identified by actorID {
+  o String actorID
+  o String orgName
+  o String email
+  o ActorType type
+}
+
+participant Manufacturer extends Actor  {
+}
+
+participant Distributor extends Actor  {
+}
+
+participant Wholesaler extends Actor  {
+}
+
+participant Pharmacist extends Actor  {
+}
+
+participant Recipient extends Actor  {
+}
+
+transaction DrugItemProduction {
+  o String drugName
+  o String drugDesc
+  o String serialNumber
+  o DateTime mfd
+  o DateTime exp
+  o Double price
+  --> Manufacturer manufacturer
+}
+
+transaction ShipmentTransfer{
+  --> Shipment shipment
+}
+
+transaction CreateShipment{
+  o String shipmentID
+  --> Drug[] drugs
+  --> Actor buyer
+  --> Actor seller
+}
+
+transaction VerifyShipment {
+  --> Shipment shipment
+}
+
+transaction DrugTransfer{
+  -->Drug drug
+  --> Actor newOwner
+}

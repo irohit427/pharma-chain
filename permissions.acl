@@ -1,0 +1,151 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Sample access control list.
+ */
+
+rule SystemACL {
+  description:  "System ACL to permit all access"
+  participant: "org.hyperledger.composer.system.Participant"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
+
+rule NetworkAdminUser {
+    description: "Grant business network administrators full access to user resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "**"
+    action: ALLOW
+}
+
+rule NetworkAdminSystem {
+    description: "Grant business network administrators full access to system resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
+
+rule EverybodyCanReadEverything {
+    description: "Allow all participants read access to all resources"
+    participant: "org.example.pharma.*"
+    operation: READ
+    resource: "org.example.pharma.*"
+    action: ALLOW
+}
+
+rule OnlyOwnerCanUpdateDrugsAsset {
+    description: "Allow only an owner to create / update the drugs asset"
+    participant(p): "org.example.pharma.*"
+    operation: CREATE,UPDATE
+    resource(r): "org.example.pharma.Drug"
+    condition: (r.owner.getIdentifier() === p.getIdentifier())
+    action: ALLOW
+}
+
+rule OnlyManufacturerCanProduceDrugs {
+    description: "Allow manufacturer to submit production transactions"
+    participant: "org.example.pharma.Manufacturer"
+    operation: CREATE
+    resource: "org.example.pharma.DrugItemProduction"
+    action: ALLOW
+}
+
+rule RecipientCanNotCreateShipment {
+    description: "Recipient can not create shipment"
+    participant: "org.example.pharma.Recipient"
+    operation: CREATE
+    resource: "org.example.pharma.CreateShipment"
+    action: DENY
+}
+
+rule RecipientCanNotTransferShipment {
+    description: "Recipient can not transfer shipment"
+    participant: "org.example.pharma.Recipient"
+    operation: CREATE
+    resource: "org.example.pharma.ShipmentTransfer"
+    action: DENY
+}
+
+rule RecipientCanNotTransferDrugs {
+    description: "Patient can not submit tranfer transactions"
+    participant: "org.example.pharma.Recipient"
+    operation: CREATE
+    resource: "org.example.pharma.DrugTransfer"
+    action: DENY
+}
+
+rule EverybodyCanCreateShipment {
+    description: "Allow all participants to create shipment"
+    participant: "org.example.pharma.*"
+    operation: CREATE
+    resource: "org.example.pharma.CreateShipment"
+    action: ALLOW
+}
+
+rule EverybodyCanTransferShipment {
+    description: "Allow all participants to transfer shipment"
+    participant: "org.example.pharma.*"
+    operation: CREATE
+    resource: "org.example.pharma.ShipmentTransfer"
+    action: ALLOW
+}
+
+rule EverybodyCanTransferDrug {
+    description: "Allow all participants to transfer drug"
+    participant: "org.example.pharma.*"
+    operation: CREATE
+    resource: "org.example.pharma.DrugTransfer"
+    action: ALLOW
+}
+
+rule EverybodyCanVerifyShipment {
+    description: "Allow all participants to verify shipment"
+    participant: "org.example.pharma.*"
+    operation: CREATE
+    resource: "org.example.pharma.VerifyShipment"
+    action: ALLOW
+}
+
+
+
+
+
+
+
+
+
+
+
+/*rule EverybodyCanSubmitTransactions {
+    description: "Allow all participants to submit transactions"
+    participant: "org.example.pharma.*"
+    operation: CREATE
+    resource: "org.example.pharma.*"
+    action: ALLOW
+}
+
+rule OwnerHasFullAccessToTheirAssets {
+    description: "Allow all participants full access to their assets"
+    participant(p): "org.example.pharma.*"
+    operation: ALL
+    resource(r): "org.example.pharma.Drug"
+    condition: (r.owner.getIdentifier() === p.getIdentifier())
+    action: ALLOW
+}
+
+*/
